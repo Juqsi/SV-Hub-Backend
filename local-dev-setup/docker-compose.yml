@@ -1,0 +1,33 @@
+#llama-3 is necessary on localhost:11434 (https://ollama.com/download)
+services:
+  weaviate:
+    image: semitechnologies/weaviate:latest
+    container_name: weaviate
+    environment:
+      - QUERY_DEFAULTS_LIMIT=20
+      - AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true
+      - PERSISTENCE_DATA_PATH=/var/lib/weaviate
+      #- ENABLE_MODULES=text2vec-transformers
+      #- DEFAULT_VECTORIZER_MODULE=text2vec-transformers
+      #- TRANSFORMERS_INFERENCE_API=http://localhost:11434
+    ports:
+      - "8080:8080"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=[root_password]
+      - MYSQL_DATABASE=SVHub
+      - MYSQL_USER=[backend_user]
+      - MYSQL_PASSWORD=[backend_password]
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  weaviate_data:
+  mariadb_data:
