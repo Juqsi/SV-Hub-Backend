@@ -4,6 +4,7 @@ import (
 	"HexMaster/api/handler/user"
 	"HexMaster/api/response"
 	"HexMaster/database"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strings"
 )
@@ -23,7 +24,7 @@ func Authentication(ctx *fiber.Ctx) error {
 	if userToken == "" {
 		response.Access = false
 		response.Msg = "Melde dich erneut an"
-		response.Error = append(response.Error, "Authorization header is missing")
+		response.AddError("Authorization header is missing")
 		response.Send(fiber.StatusUnauthorized)
 		return nil
 	}
@@ -31,7 +32,7 @@ func Authentication(ctx *fiber.Ctx) error {
 	if len(tmp) != 2 {
 		response.Access = false
 		response.Msg = "Melde dich erneut an"
-		response.Error = append(response.Error, "Token has false format")
+		response.AddError("Token has false format")
 		response.Send(fiber.StatusUnauthorized)
 		return nil
 	}
@@ -40,14 +41,14 @@ func Authentication(ctx *fiber.Ctx) error {
 	token, err := user.ValidateJWT(userToken)
 	if err != nil {
 		response.Access = false
-		response.Error = append(response.Error, err.Error())
+		response.AddError(err.Error())
 		response.Send(fiber.StatusUnauthorized)
 		return nil
 	}
-
+	fmt.Println(token)
 	if token.ID == "" {
 		response.Access = false
-		response.Error = append(response.Error, "Token ID is missing")
+		response.AddError("Token ID is missing")
 		response.Send(fiber.StatusUnauthorized)
 		return nil
 	}
@@ -57,14 +58,14 @@ func Authentication(ctx *fiber.Ctx) error {
 	users, count, err := database.Select[user.User]("SELECT * FROM users WHERE id=?;", token.Id)
 	if err != nil {
 		response.Access = false
-		response.Error = append(response.Error, err.Error())
+		response.AddError(err.Error())
 		response.Send(fiber.StatusUnauthorized)
 		return nil
 	}
 
 	if count != 1 {
 		response.Access = false
-		response.Error = append(response.Error, "User not found")
+		response.AddError("User not found")
 		response.Send(fiber.StatusUnauthorized)
 	}
 

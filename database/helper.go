@@ -65,7 +65,7 @@ func findNestedField(object any, colName string) (result interface{}, err error)
 	return
 }
 
-func isValidUUID(input string) bool {
+func IsValidUUID(input string) bool {
 	uuidPattern := `^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`
 	match, _ := regexp.MatchString(uuidPattern, input)
 	return match

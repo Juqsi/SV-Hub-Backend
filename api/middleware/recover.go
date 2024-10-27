@@ -24,9 +24,8 @@ func Recovery(ctx *fiber.Ctx) error {
 			} else {
 				err = fmt.Errorf("%v", r)
 			}
-			response.
-				Error = append(response.Error, "Panic: Recovery Done")
-			response.Error = append(response.Error, err.Error())
+			response.AddError("Panic: Recovery Done")
+			response.AddError(err.Error())
 			fmt.Println("stacktrace from panic: \n" + string(debug.Stack()))
 			response.Send(fiber.StatusInternalServerError)
 		}

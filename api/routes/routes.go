@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"HexMaster/api/handler/group"
+	"HexMaster/api/handler/post"
 	"HexMaster/api/handler/user"
 	"HexMaster/api/middleware"
 	"fmt"
@@ -39,50 +41,24 @@ func SetupRoutes() {
 	app.Put("/user", user.Update)
 	app.Get("/user/:id?", user.Get)
 	app.Delete("/:id?", user.Delete)
-	/***
-	app.Put("/file/upload", handlerUpload)
-	app.Get("/file/profile", handlerGetProfileImage)
-	app.Get("/file/profile/:userid", handlerGetProfileFromUser)
-	app.Get("/file/group/:groupid", handlerGetGroupImage)
-
-	//user
-
-	//groups
-	app.Get("/groups", handlerGetGroups)
 
 	//group
-	app.Get("/group/:groupid", handlerGetGroup)
-	app.Post("/group/:invitationtoken/join", handlerJoinGroup)
-	app.Get("/group/:groupid/newtoken", handlerNewInvitationToken)
-	app.Post("/group/:groupid/leave", handlerLeaveGroup)
-	app.Post("/group/:groupid/kick/:userid", handlerKickMember)
-	app.Delete("/group/:groupid", handlerDeleteGroup)
-	app.Post("/group", handlerCreateGroup)
-	app.Patch("/group", handlerUpdateGroup)
-	app.Get("/group/:groupid/shopping", handlerGetShoppings)
-	app.Get("/group/:groupid/todos", handlerGetTodoList)
-	app.Get("/group/:groupid/finances", handlerGetFinances)
+	app.Get("/group/:groupid", group.Get)
+	app.Post("/group/:invitationtoken/join", group.Join)
+	app.Get("/group/:groupid/newtoken", group.NewInviteToken)
+	app.Post("/group/:groupid/leave", group.Leave)
+	app.Post("/group/:groupid/kick/:userid", group.Kick)
+	app.Delete("/group/:groupid", group.Delete)
+	app.Post("/group", group.Create)
+	app.Patch("/group", group.Update)
 
-	//Todos
-	app.Get("/todo/:todoid", handlerGetTodo)
-	app.Patch("/todo/:todoid/done", handlerTodoDone)
-	app.Delete("/todo/:todoid", handlerDeleteTodo)
-	app.Post("/todo", handlerNewTodo)
-	app.Patch("/todo", handlerUpdateTodo)
+	//Posts
+	app.Get("/post/:postid", post.Get)
+	app.Delete("/post/:postid", post.Delete)
+	app.Post("/post", post.Create)
+	app.Patch("/post", post.Update)
+	app.Post("/post/:postid/like", post.Like)
 
-	//finances
-	app.Post("/finance", handlerNewFinance)
-	app.Patch("/finance", handlerUpdateFinance)
-	app.Get("/finance/:groupid/reset", handlerResetFinances)
-	app.Delete("/finance/:financeid", handlerDeleteFinance)
-
-	// Shopping
-	app.Post("/shopping", handlerCreateShopping)
-	app.Delete("/shopping/:shoppingid", handlerDeleteShopping)
-	app.Patch("/shopping/:shoppingid/toggle", handlerToggleShopping)
-	app.Patch("/shopping", handlerUpdateShopping)
-	app.Get("/shopping/:shoppingid", handlerGetShopping)
-	*/
 	fmt.Println("▶️ start server")
 	err := app.Listen(":3000")
 	if err != nil {

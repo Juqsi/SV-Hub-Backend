@@ -20,8 +20,8 @@ func Login(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	query := "SELECT * FROM users WHERE email = ?"
-	users, amount, err := database.Select[User](query, user.Email)
+	query := "SELECT * FROM users WHERE username = ?"
+	users, amount, err := database.Select[User](query, user.Username)
 	if err != nil {
 		res.Msg = response.MSG_DEFAULT
 		res.Error = append(res.Error, "Database: ")
@@ -31,7 +31,7 @@ func Login(ctx *fiber.Ctx) error {
 	}
 	if amount != 1 {
 		res.Msg = response.MSG_DEFAULT
-		res.Error = append(res.Error, "Email or Password incorrect")
+		res.Error = append(res.Error, "Username or Password incorrect")
 		res.Send(fiber.StatusBadRequest)
 		return nil
 	}
@@ -44,7 +44,7 @@ func Login(ctx *fiber.Ctx) error {
 	salt, _ := hex.DecodeString(users[0].Salt)
 	if nil != baseValues.Compare(hash, salt, []byte(user.Password)) {
 		res.Msg = response.MSG_DEFAULT
-		res.Error = append(res.Error, "Email or Password incorrect")
+		res.Error = append(res.Error, "Username or Password incorrect")
 		res.Send(fiber.StatusBadRequest)
 		return nil
 	}

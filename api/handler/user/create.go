@@ -13,7 +13,7 @@ func Create(ctx *fiber.Ctx) error {
 		/*firebaseID := token.UID
 		if firebaseID == "" {
 			response.Msg = MSG_FIREBASE_TOKEN
-			response.Error = append(response.Error, ERROR_FIREBASE_TOKEN)
+			response.Error.AddError( ERROR_FIREBASE_TOKEN)
 			response.send(fiber.StatusBadRequest)
 			return nil
 		}
@@ -21,8 +21,8 @@ func Create(ctx *fiber.Ctx) error {
 		err := ctx.BodyParser(&user)
 		if err != nil {
 			response.Msg = MSG_DEFAULT
-			response.Error = append(response.Error, "Body: JSON has false format")
-			response.Error = append(response.Error, err.Error())
+			response.Error.AddError( "Body: JSON has false format")
+			response.Error.AddError( err.Error())
 			response.send(fiber.StatusBadRequest)
 			return nil
 		}
@@ -33,13 +33,13 @@ func Create(ctx *fiber.Ctx) error {
 		if err != nil {
 			if strings.Contains(err.Error(), "Error 1062") {
 				response.Msg = "Der Benutzer wurde bereits erstellt"
-				response.Error = append(response.Error, err.Error())
+				response.Error.AddError( err.Error())
 				response.send(fiber.StatusBadRequest)
 				return nil
 			}
 			response.Msg = MSG_DEFAULT
-			response.Error = append(response.Error, "Database: error with INSERT")
-			response.Error = append(response.Error, err.Error())
+			response.Error.AddError( "Database: error with INSERT")
+			response.Error.AddError( err.Error())
 			response.send(fiber.StatusBadRequest)
 			return nil
 		}
