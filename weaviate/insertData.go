@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func InsertData(texts []string) {
+func InsertData(texts []string, class, id string) {
 	cfg := weaviate.Config{
 		Host:   utils.GetEnv("WEAVIATE_HOST", "localhost:8080"),
 		Scheme: utils.GetEnv("WEAVIATE_SCHEME", "http"),
@@ -19,7 +19,7 @@ func InsertData(texts []string) {
 	}
 
 	schema := &models.Class{
-		Class: "Document",
+		Class: class,
 		Properties: []*models.Property{
 			{
 				Name:     "text",
@@ -28,7 +28,7 @@ func InsertData(texts []string) {
 		},
 	}
 
-	_, err = client.Schema().ClassGetter().WithClassName("Document").Do(context.Background())
+	_, err = client.Schema().ClassGetter().WithClassName(class).Do(context.Background())
 	if err != nil {
 		err = client.Schema().ClassCreator().WithClass(schema).Do(context.Background())
 		if err != nil {
@@ -36,10 +36,12 @@ func InsertData(texts []string) {
 		}
 	}
 
-	for _, text := range texts {
+	for index, text := range texts {
 		_, err := client.Data().Creator().
-			WithClassName("Document").
-			WithID("uuid").
+			WithClassName(class).
+			WithID(id + string(index)).
+			//default tenant for testing later is access (group) related
+			WithTenant("default").
 			WithProperties(map[string]interface{}{
 				"text": text,
 			}).

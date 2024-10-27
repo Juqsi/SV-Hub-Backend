@@ -13,7 +13,7 @@ func Leave(ctx *fiber.Ctx) error {
 	usr := ctx.Locals("user").(user.User)
 	groupID := ctx.Params("groupid")
 
-	group, err := getGroupByID(groupID)
+	group, err := GetGroupByID(groupID)
 	if err != nil {
 		res.Msg = "Unable to get requested group."
 		res.AddError(err.Error())

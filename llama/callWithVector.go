@@ -1,6 +1,7 @@
 package llama
 
 import (
+	"HexMaster/utils"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -19,33 +20,37 @@ type RequestPayload struct {
 }
 
 // DoRequestWithVectors sends a request to the LLaMA API with vectorized data
-func DoRequestWithVectors(prompt string) (string, error) {
-	// Initialize Weaviate client
+func DoRequestWithVectors(relatedTags []string, prompt, class string) (string, error) {
 	cfg := weaviate.Config{
-		Host:   "localhost:8080",
-		Scheme: "http",
+		Host:   utils.GetEnv("WEAVIATE_HOST", "localhost:8080"),
+		Scheme: utils.GetEnv("WEAVIATE_SCHEME", "http"),
 	}
 	client, err := weaviate.NewClient(cfg)
 	if err != nil {
 		return "", fmt.Errorf("Fehler beim Initialisieren des Weaviate-Clients: %v", err)
 	}
 
-	// Retrieve vectorized data
-	result, err := client.GraphQL().Get().
-		WithClassName("Document").
-		WithFields(graphql.Field{Name: "text"}).WithLimit(5).
-		Do(context.Background())
-	if err != nil {
-		return "", fmt.Errorf("Fehler beim Abrufen der vektorisierten Daten: %v", err)
+	var allVectors []interface{}
+	for _, tag := range relatedTags {
+		// Retrieve vectorized data for each tag
+		result, err := client.GraphQL().Get().
+			WithClassName(class).
+			WithFields(graphql.Field{Name: "text"}).WithLimit(5).
+			//default tenant for testing later is access (group) related
+			WithTenant("default").
+			Do(context.Background())
+		if err != nil {
+			return "", fmt.Errorf("Fehler beim Abrufen der vektorisierten Daten für Tag %s: %v", tag, err)
+		}
+
+		documents := result.Data["Get"].(map[string]interface{})[class].([]interface{})
+		for _, doc := range documents {
+			allVectors = append(allVectors, doc.(map[string]interface{}))
+		}
 	}
 
-	var vectors []interface{}
-	documents := result.Data["Get"].(map[string]interface{})["Document"].([]interface{})
-	for _, doc := range documents {
-		vectors = append(vectors, doc.(map[string]interface{})["text"])
-	}
-	prompt = fmt.Sprintf("Context: %s \n Gibt mir für die Frage ausschließlich passende Zitate aus dem Context. Frage: %v", prompt, vectors)
-	// Create request payload
+	prompt = fmt.Sprintf("Context: %s \n Gibt mir für die Frage ausschließlich passende Zitate aus dem Context mit den uuids. Frage: %v", prompt, allVectors)
+
 	payload := RequestPayload{
 		Model:  "llama3",
 		Prompt: prompt,
@@ -56,14 +61,13 @@ func DoRequestWithVectors(prompt string) (string, error) {
 		return "", fmt.Errorf("Fehler beim Erstellen der Anfrage: %v", err)
 	}
 	fmt.Println("Vektoren:", payload)
-	// Create HTTP request
+
 	req, err := http.NewRequest("POST", "http://localhost:11434/api/generate", bytes.NewBuffer(jsonData))
 	if err != nil {
 		return "", fmt.Errorf("Fehler beim Erstellen der HTTP-Anfrage: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	// Send request
 	clientHTTP := &http.Client{}
 	resp, err := clientHTTP.Do(req)
 	if err != nil {
@@ -71,13 +75,11 @@ func DoRequestWithVectors(prompt string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Read response
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("Fehler beim Lesen der Antwort: %v", err)
 	}
 
-	// Decode response
 	var responsePayload ResponsePayload
 	err = json.Unmarshal(body, &responsePayload)
 	if err != nil {

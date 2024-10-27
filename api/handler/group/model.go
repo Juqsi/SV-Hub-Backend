@@ -5,6 +5,7 @@ type Group struct {
 	Name            string   `json:"name" db:"name"`
 	Invitationtoken string   `json:"invitationtoken" db:"invitationtoken"`
 	Members         []Member `json:"members"`
+	Parent          string   `json:"parent" db:"parent"`
 }
 
 type Member struct {
@@ -18,20 +19,20 @@ type Member struct {
 	Group    string `db:"group"`
 }
 
-type memberRole string
+type MemberRole string
 
 const (
-	MEMBER_OWNER     memberRole = "owner"
-	MEMBER_MODERATOR memberRole = "moderator"
-	MEMBER_MEMBER    memberRole = "member"
-	MEMBER_GUEST     memberRole = "guest"
+	MEMBER_OWNER     MemberRole = "owner"
+	MEMBER_MODERATOR MemberRole = "moderator"
+	MEMBER_MEMBER    MemberRole = "member"
+	MEMBER_GUEST     MemberRole = "guest"
 )
 
-func (m memberRole) String() string {
+func (m MemberRole) String() string {
 	return string(m)
 }
 
-func memberRoleFromString(role string) (memberRole, bool) {
+func memberRoleFromString(role string) (MemberRole, bool) {
 	switch role {
 	case MEMBER_OWNER.String():
 		return MEMBER_OWNER, true
@@ -42,6 +43,6 @@ func memberRoleFromString(role string) (memberRole, bool) {
 	case MEMBER_GUEST.String():
 		return MEMBER_GUEST, true
 	default:
-		return memberRole(""), false
+		return MemberRole(""), false
 	}
 }

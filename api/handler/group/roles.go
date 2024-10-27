@@ -30,7 +30,7 @@ func promoteMember(ctx *fiber.Ctx) error {
 	roleMember, ok := memberRoleFromString(role)
 	if !ok {
 		res.Msg = "Invalid role type"
-		res.AddError("role cannot be converted to memberRole")
+		res.AddError("role cannot be converted to MemberRole")
 		res.Send(fiber.StatusBadRequest)
 		return nil
 	}
@@ -42,7 +42,7 @@ func promoteMember(ctx *fiber.Ctx) error {
 	return nil
 }
 
-func changeMemberRole(groupID, userID, ownerId string, role memberRole, res *response.Response) bool {
+func changeMemberRole(groupID, userID, ownerId string, role MemberRole, res *response.Response) bool {
 	query := "UPDATE `members` SET role = ? WHERE EXISTS (SELECT 1 FROM members WHERE `group` = ? AND members.role = ? AND members.user = ?) AND members.`group` = ? AND members.user = ?;"
 	effectedRows, err := database.Update(query, role, groupID, MEMBER_OWNER, ownerId, groupID, userID)
 	if err != nil {

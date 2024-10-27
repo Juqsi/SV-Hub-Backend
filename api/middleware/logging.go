@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func logging(app *fiber.App) {
+func Logging(app *fiber.App) {
 	app.Use(logger.New(logger.Config{
 		Format:     "${time} -- ${status} -- ${method} ${path} ${queryParams} ${latency} \n",
 		TimeFormat: "2006-01-02 15:04:05.00000",

@@ -20,7 +20,7 @@ func Get(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	group, err := getGroupByID(groupID)
+	group, err := GetGroupByID(groupID)
 	if err != nil {
 		res.Msg = "Unable to get group information."
 		res.AddError(err.Error())
@@ -28,7 +28,7 @@ func Get(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	if !isUserInGroup(group, usr.Id) {
+	if !IsUserInGroup(group, usr.Id) {
 		res.Msg = "You are not part of the requested group."
 		res.AddError("user id not in members slice of requested group")
 		res.Send(fiber.StatusUnauthorized)
@@ -40,7 +40,7 @@ func Get(ctx *fiber.Ctx) error {
 	return nil
 }
 
-func getGroupByID(groupID string) (*Group, error) {
+func GetGroupByID(groupID string) (*Group, error) {
 	groups, count, err := database.Select[Group]("SELECT * FROM `groups` WHERE id=?", groupID)
 	if err != nil {
 		return nil, err
@@ -66,10 +66,10 @@ func getMembersByGroupID(groupID string) ([]Member, error) {
 	return members, nil
 }
 
-func isUserInGroup(group *Group, userID string) bool {
+func IsUserInGroup(group *Group, userID string) bool {
 	for _, member := range group.Members {
 		if member.UserID == userID {
-			if member.Role != "owner" {
+			if member.Role != MEMBER_OWNER.String() {
 				group.Invitationtoken = ""
 			}
 			return true
@@ -79,7 +79,7 @@ func isUserInGroup(group *Group, userID string) bool {
 }
 
 func getMemberFromGroupByUserID(group Group, userID string) *Member {
-	if !isUserInGroup(&group, userID) {
+	if !IsUserInGroup(&group, userID) {
 		return nil
 	}
 	for _, member := range group.Members {

@@ -23,8 +23,8 @@ func Update(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	oldGroup, err := getGroupByID(group.Id)
-	if !isUserInGroup(oldGroup, usr.Id) {
+	oldGroup, err := GetGroupByID(group.Id)
+	if !IsUserInGroup(oldGroup, usr.Id) {
 		res.Msg = "You are not part of the group."
 		res.Send(fiber.StatusUnauthorized)
 		return nil

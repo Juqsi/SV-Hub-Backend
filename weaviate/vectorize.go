@@ -1,6 +1,7 @@
 package weaviate
 
 import (
+	"HexMaster/utils"
 	"context"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	models "github.com/weaviate/weaviate/entities/models"
@@ -9,8 +10,8 @@ import (
 
 func VectorizeAndStoreData(texts []string) {
 	cfg := weaviate.Config{
-		Host:   "localhost:8080",
-		Scheme: "http",
+		Host:   utils.GetEnv("WEAVIATE_HOST", "localhost:8080"),
+		Scheme: utils.GetEnv("WEAVIATE_SCHEME", "http"),
 	}
 	client, err := weaviate.NewClient(cfg)
 	if err != nil {

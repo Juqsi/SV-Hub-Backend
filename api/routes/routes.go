@@ -3,6 +3,7 @@ package routes
 import (
 	"HexMaster/api/handler/group"
 	"HexMaster/api/handler/post"
+	"HexMaster/api/handler/search"
 	"HexMaster/api/handler/user"
 	"HexMaster/api/middleware"
 	"fmt"
@@ -12,8 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 )
 
-const AcceptedDateTimeFormat string = "2006-01-02T15:04:05Z"
-
 func SetupRoutes() {
 	var app = fiber.New(fiber.Config{
 		BodyLimit: 5 * 1024 * 1024, // MB
@@ -22,14 +21,12 @@ func SetupRoutes() {
 
 	app.Use(requestid.New())
 
-	//Monitor
-	app.Get("/monitor", monitor.New(monitor.Config{Title: "SV-Hub"}))
-
-	//logging(app)
-
+	//Middleware
+	app.Get("/monitor", monitor.New(monitor.Config{Title: "SVHub"}))
+	middleware.Logging(app)
 	app.Use(middleware.Recovery)
-
 	app.Use(middleware.ResponseBuilder)
+
 	//login
 	app.Post("/login", user.Login)
 	app.Post("/registration", user.Registration)
@@ -58,6 +55,9 @@ func SetupRoutes() {
 	app.Post("/post", post.Create)
 	app.Patch("/post", post.Update)
 	app.Post("/post/:postid/like", post.Like)
+
+	//search
+	app.Get("/search", search.DeepSearch)
 
 	fmt.Println("▶️ start server")
 	err := app.Listen(":3000")

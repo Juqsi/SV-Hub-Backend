@@ -44,7 +44,7 @@ func Join(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	group, err := getGroupByID(groups[0].Id)
+	group, err := GetGroupByID(groups[0].Id)
 	if err != nil {
 		res.Msg = "Group might not exist."
 		res.AddError("unable to get group by id")
@@ -71,7 +71,7 @@ func NewInviteToken(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	group, err := getGroupByID(groupID)
+	group, err := GetGroupByID(groupID)
 	if err != nil {
 		res.Msg = "Group might not exist."
 		res.AddError("unable to get group by id")

@@ -5,5 +5,6 @@ import (
 )
 
 func Delete(ctx *fiber.Ctx) error {
+	return nil
 
 }
