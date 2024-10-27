@@ -3,11 +3,12 @@ package user
 import (
 	"HexMaster/api/response"
 	"HexMaster/database"
+	"encoding/hex"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Login(ctx *fiber.Ctx) error {
-	res := ctx.Locals("res").(response.Response)
+	res := ctx.Locals("response").(response.Response)
 	user := User{}
 
 	err := ctx.BodyParser(&user)
@@ -36,10 +37,12 @@ func Login(ctx *fiber.Ctx) error {
 	}
 
 	baseValues := PBKDF2Hash{
-		KeyLen:  len(user.password),
+		KeyLen:  len(user.Password),
 		SaltLen: len(user.Salt),
 	}
-	if nil != baseValues.Compare([]byte(users[0].Hash), []byte(users[0].Salt), []byte(user.password)) {
+	hash, _ := hex.DecodeString(users[0].Hash)
+	salt, _ := hex.DecodeString(users[0].Salt)
+	if nil != baseValues.Compare(hash, salt, []byte(user.Password)) {
 		res.Msg = response.MSG_DEFAULT
 		res.Error = append(res.Error, "Email or Password incorrect")
 		res.Send(fiber.StatusBadRequest)

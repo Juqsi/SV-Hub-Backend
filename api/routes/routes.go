@@ -27,11 +27,12 @@ func SetupRoutes() {
 
 	app.Use(middleware.Recovery)
 
-	app.Use(middleware.Authentication)
-
+	app.Use(middleware.ResponseBuilder)
 	//login
 	app.Post("/login", user.Login)
-	app.Post("/login", user.Registration)
+	app.Post("/registration", user.Registration)
+
+	app.Use(middleware.Authentication)
 
 	//user
 	app.Post("/user", user.Create)

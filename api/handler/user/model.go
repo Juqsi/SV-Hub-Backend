@@ -9,6 +9,6 @@ type User struct {
 	Telenum  string `json:"telenum" db:"telenum"`
 	Salt     string `json:"-" db:"salt"`
 	Hash     string `json:"-" db:"hash"`
-	password string `json:"password"`
+	Password string `json:"password"`
 	Token    string `json:"token"`
 }

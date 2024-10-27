@@ -3,11 +3,12 @@ package user
 import (
 	"HexMaster/api/response"
 	"HexMaster/database"
+	"encoding/hex"
 	"github.com/gofiber/fiber/v2"
 )
 
 func Registration(ctx *fiber.Ctx) error {
-	res := ctx.Locals("res").(response.Response)
+	res := ctx.Locals("response").(response.Response)
 	user := User{}
 
 	err := ctx.BodyParser(&user)
@@ -20,7 +21,7 @@ func Registration(ctx *fiber.Ctx) error {
 	}
 
 	baseValues := PBKDF2Hash{
-		KeyLen:  len(user.password),
+		KeyLen:  len(user.Password),
 		SaltLen: len(user.Salt),
 	}
 
@@ -31,7 +32,7 @@ func Registration(ctx *fiber.Ctx) error {
 		res.Send(fiber.StatusInternalServerError)
 		return nil
 	}
-	hashSalt, err := baseValues.GenerateHash([]byte(user.password), salt)
+	hashSalt, err := baseValues.GenerateHash([]byte(user.Password), salt)
 	if err != nil {
 		res.Msg = response.MSG_DEFAULT
 		res.Error = append(res.Error, "Hash generating error")
@@ -39,11 +40,10 @@ func Registration(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	user.Salt = string(hashSalt.Salt)
-	user.Hash = string(hashSalt.Hash)
-
+	user.Salt = hex.EncodeToString(hashSalt.Salt)
+	user.Hash = hex.EncodeToString(hashSalt.Hash)
 	//Secure because of the own escape library, just easier to read
-	id, err := database.Insert("INSERT INTO users (forename, lastname, telenum,email,username,hash,salt)VALUES ({forename},{lastname}, {telenum},{email},{username},{hash},{salt});", "id", &user)
+	id, err := database.Insert("INSERT INTO users (forename, lastname, telenum, email, username, hash, salt) VALUES (?, ?, ?, ?, ?, ?, ?);", "id", user.Forename, user.Lastname, user.Telenum, user.Email, user.Username, user.Hash, user.Salt)
 	if err != nil {
 		res.Msg = response.MSG_DEFAULT
 		res.Error = append(res.Error, "Body: JSON has false format")

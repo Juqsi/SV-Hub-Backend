@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/pbkdf2"
 	"golang.org/x/crypto/sha3"
 )
@@ -26,6 +27,8 @@ func (p *PBKDF2Hash) GenerateHash(password, salt []byte) (*HashSalt, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("password")
+	fmt.Println(password)
 	hash := pbkdf2.Key(password, salt, 5, p.KeyLen, sha3.New256)
 	return &HashSalt{Hash: hash, Salt: salt}, nil
 }

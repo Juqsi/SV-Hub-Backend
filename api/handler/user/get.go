@@ -5,5 +5,6 @@ import (
 )
 
 func Get(ctx *fiber.Ctx) error {
+
 	return nil
 }
